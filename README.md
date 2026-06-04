@@ -1,68 +1,139 @@
-# Angie
+# 🎂 Birthday 18th
 
-ANGIE is a sleek Astro portfolio template built for creatives and developers. Featuring responsive layouts, customizable sections, and a bold brutalist design, it’s made to help you stand out and showcase your work with style.
+A modern birthday website built with Astro, Tailwind CSS, GSAP, and Supabase. Features include a birthday landing page, interactive gallery, wish submission system, and blog support.
 
-![basics](./src/assets/demo/thumbnail.png)
+![Preview](./src/assets/demo/thumbnail.png)
 
-### Dependencies used in this project:
+## ✨ Features
 
-- [TailwindCSS](https://tailwindcss.com/)
+- 🎉 Interactive birthday landing page
+- 💌 Wish submission form
+- 🖼️ Photo gallery
+- 📝 Blog posts support
+- ☁️ Supabase integration
+- 📱 Fully responsive design
+- ⚡ Fast performance with Astro
+- 🎨 Smooth animations with GSAP
+
+## 🛠️ Tech Stack
+
+- [Astro](https://astro.build/)
+- [Tailwind CSS](https://tailwindcss.com/)
 - [GSAP](https://gsap.com/)
-- [Remix Icon](https://remixicon.com/)
+- [Supabase](https://supabase.com/)
 
-### Credits:
-
-- [Pexels images](https://www.pexels.com/)
-- [Design inspo](<https://www.figma.com/design/YHGwlMXQLVCE3mTF4JVA5I/2024-Portfolios-(Community)?node-id=1-914&t=6JAt4v8pqxzppZ0b-0>)
-
-Inside of your Astro project, you'll see the following folders and files:
+## 📂 Project Structure
 
 ```text
-
+.
+├── database/
+│   └── schema.sql
 ├── public/
-│   └── favicon.svg
+│   ├── favicon.svg
+│   └── profile.jpg
 ├── src/
+│   ├── assets/
+│   │   ├── demo/
+│   │   ├── services/
+│   │   └── *.svg
 │   ├── components/
-│   │   └── Bars.astro
-        └── Button.astro
-        └── CallToAction.astro
-        └── Footer.astro
-        └── Header.astro
-        └── Hero.astro
-        └── MarddownPost.astro
-        └── Reviews.astro
-        └── Service.astro
-        └── Tools.astro
-        └── Work.astro
+│   │   ├── About.astro
+│   │   ├── Bars.astro
+│   │   ├── Button.astro
+│   │   ├── CallToAction.astro
+│   │   ├── Footer.astro
+│   │   ├── FormGallery.astro
+│   │   ├── FormMakeAWish.astro
+│   │   ├── Gallery.astro
+│   │   ├── Header.astro
+│   │   ├── Hero.astro
+│   │   ├── MakeAWish.astro
+│   │   ├── MarkdownPost.astro
+│   │   └── Marquee.astro
 │   ├── layouts/
 │   │   └── Layout.astro
-│   └── pages/
-        └── posts/
-        └── blog.astro
-        └── index.astro
-└── styles/
-└── package.json
+│   ├── lib/
+│   │   └── supabase.js
+│   ├── pages/
+│   │   ├── posts/
+│   │   │   ├── post-1.md
+│   │   │   ├── post-2.md
+│   │   │   └── post-3.md
+│   │   ├── blog.astro
+│   │   └── index.astro
+│   ├── styles/
+│   │   └── global.css
+│   └── config.ts
+├── .env.example
+├── astro.config.mjs
+├── package.json
+├── tsconfig.json
+└── README.md
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## 🚀 Getting Started
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+Clone the repository:
 
-Any static assets, like images, can be placed in the `public/` directory.
+```bash
+git clone <repository-url>
+cd birthday18th
+```
 
-## 🧞 Commands
+Install dependencies:
 
-All commands are run from the root of the project, from a terminal:
+```bash
+npm install
+```
 
-| Command         | Action                                      |
-| :-------------- | :------------------------------------------ |
-| `npm install`   | Installs dependencies                       |
-| `npm run dev`   | Starts local dev server at `localhost:4321` |
-| `npm run build` | Build your production site to `./dist/`     |
+Create your environment file:
 
-## 👀 Curious to Explore More?
+```bash
+cp .env.example .env
+```
 
-Check out [LAB-CH3](https://github.com/LaB-CH3) for a growing collection of current and future templates.
+Configure your Supabase credentials:
 
-If you’ve found this helpful, consider fueling my creativity!  
-[![Buy me a coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://ko-fi.com/indieteamofone)
+```env
+PUBLIC_SUPABASE_URL=your_supabase_url
+PUBLIC_SUPABASE_KEY=your_supabase_anon_key
+```
+
+Run the development server:
+
+```bash
+npm run dev
+```
+
+Open:
+
+```text
+http://localhost:4321
+```
+
+## 🗄️ Database Setup
+
+Run the SQL schema located in:
+
+```text
+database/schema.sql
+```
+
+inside your Supabase SQL Editor to create the required tables.
+
+## 🧞 Available Commands
+
+| Command         | Description                          |
+| --------------- | ------------------------------------ |
+| `pnpm install`   | Install dependencies                 |
+| `pnpm run dev`   | Start development server             |
+| `pnpm run build` | Build project for production         |
+| `pnpm run preview` | Preview production build locally   |
+
+## 📸 Screenshots
+
+Add your project screenshots here.
+
+## 📄 License
+
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.

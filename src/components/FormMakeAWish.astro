@@ -1,0 +1,106 @@
+---
+import svgPinkStar from "../assets/pink-star.svg";
+import Button from "./Button.astro";
+import { buy } from "../config";
+---
+
+<div class="max-w-3xl mx-auto bg-white text-center flex flex-col gap-4 border-3 border-black shadow-[8px_8px_0px_rgba(0,0,0,0.3)] relative p-10 mt-10">
+    <h1 class="text-3xl">Ucapan untuk Saniya</h1>
+    <p class="text-lg max-w-lg mx-auto">
+      Berikan ucapan terbaikmu untuk Saniya
+    </p>
+    <form class="flex flex-col gap-4 mt-6 text-left relative z-10" action="#" method="POST" id="wish-form">
+      <div class="flex flex-col gap-2">
+        <label for="name" class="font-bold text-lg">Nama</label>
+        <input 
+          type="text" 
+          id="name" 
+          name="name" 
+          placeholder="Masukkan namamu" 
+          class="border-3 border-black p-3 outline-none focus:bg-[var(--yellow)] transition-colors w-full rounded-none"
+          required
+        />
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="message" class="font-bold text-lg">Ucapan</label>
+        <textarea 
+          id="message" 
+          name="message" 
+          rows="4" 
+          placeholder="Tulis ucapan terbaikmu untuk Saniya..." 
+          class="border-3 border-black p-3 outline-none focus:bg-[var(--yellow)] transition-colors resize-none w-full rounded-none"
+          required
+        ></textarea>
+      </div>
+      <button 
+        type="submit" 
+        class="bg-[var(--blue)] text-black font-bold text-lg border-3 border-black py-3 mt-4 transition-all hover:opacity-80 flex items-center justify-center gap-2 rounded-full cursor-pointer relative"
+      >
+        Kirim Ucapan <i class="ri-send-plane-fill"></i>
+      </button>
+    </form>
+    <img
+      src={svgPinkStar.src}
+      alt="svg"
+      width="80"
+      class="absolute -top-10 right-20"
+    />
+  </div>
+
+<script>
+  import { supabase } from "../lib/supabase";
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('wish-form') as HTMLFormElement;
+    if (!form) return;
+
+    // Submit on Enter (Shift+Enter for newline)
+    const messageInput = document.getElementById('message') as HTMLTextAreaElement;
+    messageInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        form.requestSubmit();
+      }
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = 'Mengirim... <i class="ri-loader-4-line animate-spin"></i>';
+      submitBtn.disabled = true;
+
+      const formData = new FormData(form);
+      const name = formData.get('name') as string;
+      const message = formData.get('message') as string;
+
+      try {
+        const { error } = await supabase.from("wishes").insert({
+          sender_name: name,
+          message: message,
+          created_at: new Date().toISOString()
+        });
+
+        if (error) throw error;
+        
+        form.reset();
+        
+        // Panggil event lokal agar UI langsung update tanpa menunggu realtime
+        window.dispatchEvent(new CustomEvent('wish-added'));
+
+        // Feedback visual sederhana
+        submitBtn.innerHTML = 'Berhasil! <i class="ri-check-line"></i>';
+        setTimeout(() => {
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+        }, 3000);
+      } catch (error) {
+        console.error("Error adding document: ", error);
+        alert('Gagal mengirim ucapan, coba lagi nanti.');
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+  });
+</script>

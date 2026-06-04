@@ -1,0 +1,188 @@
+---
+import svgNew from "../assets/new.svg";
+import Form from "./FormMakeAWish.astro";
+---
+
+<section id="message">
+  <div class="max-w-4xl mx-auto pb-20 px-10 overflow-hidden">
+    <div class="grid grid-cols-1 md:grid-cols-2">
+      <div class="flex relative">
+        <h1 class="text-3xl">
+          Here's what yours friends say!
+        </h1>
+        <img
+          src={svgNew.src}
+          alt="arrow"
+          width="40"
+          class="absolute -right-3 md:-right-10 bottom-0"
+        />
+      </div>
+    </div>
+
+    <!-- Container for dynamic wishes from Supabase -->
+    <div id="wishes-container" class="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 py-10">
+      <!-- Loading state -->
+      <div class="col-span-1 md:col-span-2 text-center py-10">
+        <p class="animate-pulse text-lg font-bold">Memuat ucapan...</p>
+      </div>
+    </div>
+    
+    <div class="mt-20">
+      <Form />
+    </div>
+  </div>
+</section>
+
+<script>
+  import { supabase } from "../lib/supabase";
+
+  const styleClasses = [
+    "",
+  ];
+
+  // Helper function to render wishes
+  function renderWishes(wishes: any[], container: HTMLElement) {
+    container.innerHTML = ""; // Bersihkan loading atau data lama
+
+    if (wishes.length === 0) {
+      container.innerHTML = `<p class="col-span-1 md:col-span-2 text-center py-10">Belum ada ucapan. Jadilah yang pertama!</p>`;
+      return;
+    }
+
+    wishes.forEach((data, index) => {
+      const id = data.id;
+      
+      // Pilih gaya acak berdasarkan index
+      const cls = styleClasses[index % styleClasses.length];
+      
+      // Format waktu
+      let timeString = "";
+      if (data.created_at) {
+        const date = new Date(data.created_at);
+        const day = date.getDate();
+        const month = date.toLocaleString('id-ID', { month: 'short' });
+        const year = date.getFullYear();
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        timeString = `${day} ${month} ${year} ${hours}:${minutes}`;
+      }
+
+      // Setup Like dari LocalStorage (untuk status disukai user ini) dan Supabase (untuk total like)
+      let totalLikes = data.likes || 0;
+      let isLiked = localStorage.getItem(id + "-isLiked") === "true";
+
+      const card = document.createElement("div");
+      card.className = `flex flex-col gap-3 p-5 bg-white border-2 shadow-[6px_6px_0px_rgba(0,0,0,0.3)] ${cls} hover:scale-105 hover:ring-2 hover:ring-black duration-200`;
+      
+      card.innerHTML = `
+        <p>${data.message}</p>
+        <div class="flex items-center justify-between mt-auto pt-2">
+          <div class="flex items-center gap-2">
+            <div>
+              <h3 class="font-medium text-sm md:text-base">
+                ${data.sender_name || "Anonim"}
+              </h3>
+              <p class="text-xs md:text-sm">${timeString}</p>
+            </div>
+          </div>
+          <button
+            class="like-btn flex items-center gap-1 border-2 border-black px-3 py-1 rounded-full hover:bg-[var(--yellow)] transition-colors active:translate-y-1 z-10 cursor-pointer"
+            data-id="${id}"
+          >
+            <i class="ri-heart-3-${isLiked ? 'fill text-red-500' : 'line'} text-lg heart-icon"></i>
+            <span class="like-count font-bold text-sm">${totalLikes}</span>
+          </button>
+        </div>
+      `;
+
+      container.appendChild(card);
+    });
+
+    // Pasang event listener untuk semua tombol like baru
+    const likeButtons = container.querySelectorAll(".like-btn");
+    likeButtons.forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const btnId = btn.getAttribute("data-id");
+        const countSpan = btn.querySelector(".like-count");
+        const icon = btn.querySelector(".heart-icon");
+
+        if (!btnId) return;
+
+        let currentIsLiked = localStorage.getItem(btnId + "-isLiked") === "true";
+
+        try {
+          if (!currentIsLiked) {
+            // Animasi instan
+            icon?.classList.remove("ri-heart-3-line");
+            icon?.classList.add("ri-heart-3-fill", "text-red-500");
+            if (countSpan) countSpan.textContent = (parseInt(countSpan.textContent || '0') + 1).toString();
+            
+            localStorage.setItem(btnId + "-isLiked", "true");
+            
+            // Get current likes and increment
+            const { data: current } = await supabase.from("wishes").select("likes").eq("id", btnId).single();
+            await supabase.from("wishes").update({ likes: (current?.likes || 0) + 1 }).eq("id", btnId);
+          } else {
+            // Animasi instan
+            icon?.classList.remove("ri-heart-3-fill", "text-red-500");
+            icon?.classList.add("ri-heart-3-line");
+            if (countSpan) countSpan.textContent = Math.max(parseInt(countSpan.textContent || '1') - 1, 0).toString();
+            
+            localStorage.setItem(btnId + "-isLiked", "false");
+            
+            // Get current likes and decrement
+            const { data: current } = await supabase.from("wishes").select("likes").eq("id", btnId).single();
+            await supabase.from("wishes").update({ likes: Math.max((current?.likes || 1) - 1, 0) }).eq("id", btnId);
+          }
+        } catch (error) {
+          console.error("Gagal update like:", error);
+        }
+      });
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    const container = document.getElementById("wishes-container");
+    if (!container) return;
+
+    // Initial fetch
+    const { data: wishes, error } = await supabase
+      .from("wishes")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching wishes:", error);
+      container.innerHTML = `<p class="col-span-1 md:col-span-2 text-center py-10">Gagal memuat ucapan.</p>`;
+      return;
+    }
+
+    renderWishes(wishes || [], container);
+
+    // Listener untuk update lokal (jika disubmit dari tab ini)
+    window.addEventListener('wish-added', async () => {
+      const { data: updatedWishes } = await supabase
+        .from("wishes")
+        .select("*")
+        .order("created_at", { ascending: false });
+      renderWishes(updatedWishes || [], container);
+    });
+
+    // Subscribe to realtime changes (untuk update dari tab/orang lain)
+    supabase
+      .channel("wishes-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "wishes" }, async (payload) => {
+        console.log("Realtime update:", payload);
+        const { data: updatedWishes } = await supabase
+          .from("wishes")
+          .select("*")
+          .order("created_at", { ascending: false });
+        
+        renderWishes(updatedWishes || [], container);
+      })
+      .subscribe((status) => {
+        console.log("Realtime status:", status);
+      });
+  });
+</script>

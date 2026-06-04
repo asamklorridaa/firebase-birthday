@@ -1,29 +1,51 @@
 ---
-import logoStar from '../assets/logo-star.svg'
-import { author } from '../sample'
+import logoStar from "../assets/logo-star.svg";
+import { author } from "../config";
+import { dev } from "../config"
 
 const socials = [
-  { icon: 'ri-tiktok-fill', link: author.tiktok },
-	{ icon: 'ri-instagram-line', link: author.ig },
-  { icon: 'ri-twitter-x-line', link: author.x },
-]
-
+  { icon: "ri-tiktok-fill", link: dev.tiktok },
+  { icon: "ri-instagram-line", link: dev.ig },
+  { icon: "ri-github-line", link: dev.github },
+  { icon: "ri-mail-line", link: dev.email },
+];
 ---
 
 <footer class="border-t-4 px-5 md:px-0 py-10 mt-30">
-    <div class="max-w-3xl mx-auto flex justify-center flex-col gap-5 md:gap-0 md:grid md:grid-cols-3 items-center">
-      <div class="flex-1 font-bold">
-        <a href="/" class="flex items-center gap-3 text-xl">
-            <img src={logoStar.src} alt="logo" width="30" /> {author.nickname}
-        </a>
-      </div>
-      <div class="text-center">
-        <p>© {new Date().getFullYear()} {author.nickname}. All rights reserved.</p>
-      </div>
-      <div class="flex md:justify-end gap-5">
-        {socials.map(item => ( 
-          <a href={item.link} target="_blank" class="transition-all duration-200 hover:translate-y-[2px]"><i class={`${item.icon} text-2xl`}></i></a>
-        ))}
+  <div
+    class="max-w-3xl mx-auto flex justify-center flex-col gap-5 md:gap-0 md:grid md:grid-cols-3 items-center"
+  >
+    <div class="flex-1 font-bold">
+      <a href="/" class="flex items-center gap-3 text-xl">
+        <img src={logoStar.src} alt="logo" width="30" />
+        {author.title}
+      </a>
+    </div>
+    <div class="text-center">
+      <p>
+        © {new Date().getFullYear()}
+        <a
+          href="https://asamklorridaa.vercel.app"
+          target="_blank"
+          class="hover:text-blue-500">AsamKlorrida</a
+        >. All rights reserved.
+      </p>
+    </div>
+    <div class="flex flex-col items-start md:items-end gap-2">
+      <h1 class="text-sm font-semibold opacity-80">Developer Social Media</h1>
+      <div class="flex gap-5">
+        {
+          socials.map((item) => (
+            <a
+              href={item.link}
+              target="_blank"
+              class="transition-all duration-200 hover:translate-y-[2px]"
+            >
+              <i class={`${item.icon} text-2xl`} />
+            </a>
+          ))
+        }
       </div>
     </div>
-   </footer>
+  </div>
+</footer>

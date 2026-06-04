@@ -1,0 +1,72 @@
+.
+├── database
+│   └── schema.sql
+├── public
+│   ├── favicon.svg
+│   └── profile.jpg
+├── src
+│   ├── assets
+│   │   ├── demo
+│   │   │   ├── basic-mobile.png
+│   │   │   ├── basic.png
+│   │   │   └── thumbnail.png
+│   │   ├── services
+│   │   │   ├── proto.svg
+│   │   │   ├── research.svg
+│   │   │   ├── ui.svg
+│   │   │   └── wire.svg
+│   │   ├── arrow-card.svg
+│   │   ├── arrow.svg
+│   │   ├── blue-star-card.svg
+│   │   ├── hero-content.svg
+│   │   ├── hl.svg
+│   │   ├── idea.svg
+│   │   ├── item-one.svg
+│   │   ├── item-two.svg
+│   │   ├── logo-star.svg
+│   │   ├── mini-frame.svg
+│   │   ├── new.svg
+│   │   ├── pink-star.svg
+│   │   ├── red-star.svg
+│   │   ├── string.svg
+│   │   └── underline.svg
+│   ├── components
+│   │   ├── About.astro
+│   │   ├── Bars.astro
+│   │   ├── Button.astro
+│   │   ├── CallToAction.astro
+│   │   ├── Footer.astro
+│   │   ├── FormGallery.astro
+│   │   ├── FormMakeAWish.astro
+│   │   ├── Gallery.astro
+│   │   ├── Header.astro
+│   │   ├── Hero.astro
+│   │   ├── MakeAWish.astro
+│   │   ├── MarkdownPost.astro
+│   │   └── Marquee.astro
+│   ├── layouts
+│   │   └── Layout.astro
+│   ├── lib
+│   │   └── supabase.js
+│   ├── pages
+│   │   ├── posts
+│   │   │   ├── post-1.md
+│   │   │   ├── post-2.md
+│   │   │   └── post-3.md
+│   │   ├── blog.astro
+│   │   └── index.astro
+│   ├── styles
+│   │   └── global.css
+│   └── config.ts
+├── LICENSE
+├── README.md
+├── astro.config.mjs
+├── package-lock.json
+├── package.json
+├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
+├── tree.txt
+├── tsconfig.json
+└── walkthrough.md
+
+13 directories, 57 files
