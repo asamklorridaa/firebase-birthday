@@ -2,7 +2,7 @@
 
 A modern birthday website built with Astro, Tailwind CSS, GSAP, and Supabase. Features include a birthday landing page, interactive gallery, wish submission system, and blog support.
 
-![Preview](./src/assets/demo/thumbnail.png)
+![Preview](./src/assets/demo/preview.png)
 
 ## ✨ Features
 
