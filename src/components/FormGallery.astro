@@ -62,7 +62,8 @@ import svgPinkStar from "../assets/pink-star.svg";
 </div>
 
 <script>
-  import { supabase } from "../lib/supabase";
+  import { db } from "../lib/firebase";
+  import { collection, addDoc } from "firebase/firestore";
 
   document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('gallery-form') as HTMLFormElement;
@@ -165,16 +166,14 @@ import svgPinkStar from "../assets/pink-star.svg";
         // Kompresi gambar menjadi base64 string
         const base64Image = await compressImage(file);
 
-        // Upload string base64 langsung ke Supabase
-        const { error } = await supabase.from("gallery").insert({
+        // Upload string base64 langsung ke Firebase
+        await addDoc(collection(db, "gallery"), {
           sender: name,
           caption: caption,
           image: base64Image,
           likes: 0,
           created_at: new Date().toISOString()
         });
-
-        if (error) throw error;
         
         form.reset();
         if (fileInfo) {

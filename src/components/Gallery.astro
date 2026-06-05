@@ -33,7 +33,8 @@ import FormGallery from "./FormGallery.astro";
 </section>
 
 <script>
-  import { supabase } from "../lib/supabase";
+  import { db } from "../lib/firebase";
+  import { collection, query, orderBy, onSnapshot, doc, getDoc, updateDoc } from "firebase/firestore";
 
   // Helper function to render gallery items
   function renderGallery(items: any[], container: HTMLElement) {
@@ -115,8 +116,12 @@ import FormGallery from "./FormGallery.astro";
             
             localStorage.setItem(btnId + "-galleryIsLiked", "true");
             
-            const { data: current } = await supabase.from("gallery").select("likes").eq("id", btnId).single();
-            await supabase.from("gallery").update({ likes: (current?.likes || 0) + 1 }).eq("id", btnId);
+            const docRef = doc(db, "gallery", btnId);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+              const currentLikes = docSnap.data().likes || 0;
+              await updateDoc(docRef, { likes: currentLikes + 1 });
+            }
           } else {
             icon?.classList.remove("ri-heart-3-fill", "text-red-500");
             icon?.classList.add("ri-heart-3-line");
@@ -124,8 +129,12 @@ import FormGallery from "./FormGallery.astro";
             
             localStorage.setItem(btnId + "-galleryIsLiked", "false");
             
-            const { data: current } = await supabase.from("gallery").select("likes").eq("id", btnId).single();
-            await supabase.from("gallery").update({ likes: Math.max((current?.likes || 1) - 1, 0) }).eq("id", btnId);
+            const docRef = doc(db, "gallery", btnId);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+              const currentLikes = docSnap.data().likes || 1;
+              await updateDoc(docRef, { likes: Math.max(currentLikes - 1, 0) });
+            }
           }
         } catch (error) {
           console.error("Gagal update like:", error);
@@ -138,32 +147,18 @@ import FormGallery from "./FormGallery.astro";
     const container = document.getElementById("gallery-container");
     if (!container) return;
 
-    // Initial fetch
-    const { data: items, error } = await supabase
-      .from("gallery")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const q = query(collection(db, "gallery"), orderBy("created_at", "desc"));
 
-    if (error) {
+    // Subscribe to realtime changes (menangani initial fetch juga)
+    onSnapshot(q, (snapshot) => {
+      const items = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      renderGallery(items, container);
+    }, (error) => {
       console.error("Error fetching gallery:", error);
       container.innerHTML = `<p class="col-span-1 md:col-span-2 lg:col-span-2 text-center py-10">Gagal memuat galeri.</p>`;
-      return;
-    }
-
-    renderGallery(items || [], container);
-
-    // Subscribe to realtime changes
-    supabase
-      .channel("gallery-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "gallery" }, async () => {
-        // Re-fetch all gallery items on any change
-        const { data: updatedItems } = await supabase
-          .from("gallery")
-          .select("*")
-          .order("created_at", { ascending: false });
-        
-        renderGallery(updatedItems || [], container);
-      })
-      .subscribe();
+    });
   });
 </script>

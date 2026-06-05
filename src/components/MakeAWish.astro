@@ -34,7 +34,8 @@ import Form from "./FormMakeAWish.astro";
 </section>
 
 <script>
-  import { supabase } from "../lib/supabase";
+  import { db } from "../lib/firebase";
+  import { collection, query, orderBy, onSnapshot, doc, getDoc, updateDoc } from "firebase/firestore";
 
   const styleClasses = [
     "",
@@ -121,8 +122,12 @@ import Form from "./FormMakeAWish.astro";
             localStorage.setItem(btnId + "-isLiked", "true");
             
             // Get current likes and increment
-            const { data: current } = await supabase.from("wishes").select("likes").eq("id", btnId).single();
-            await supabase.from("wishes").update({ likes: (current?.likes || 0) + 1 }).eq("id", btnId);
+            const docRef = doc(db, "wishes", btnId);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+              const currentLikes = docSnap.data().likes || 0;
+              await updateDoc(docRef, { likes: currentLikes + 1 });
+            }
           } else {
             // Animasi instan
             icon?.classList.remove("ri-heart-3-fill", "text-red-500");
@@ -132,8 +137,12 @@ import Form from "./FormMakeAWish.astro";
             localStorage.setItem(btnId + "-isLiked", "false");
             
             // Get current likes and decrement
-            const { data: current } = await supabase.from("wishes").select("likes").eq("id", btnId).single();
-            await supabase.from("wishes").update({ likes: Math.max((current?.likes || 1) - 1, 0) }).eq("id", btnId);
+            const docRef = doc(db, "wishes", btnId);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+              const currentLikes = docSnap.data().likes || 1;
+              await updateDoc(docRef, { likes: Math.max(currentLikes - 1, 0) });
+            }
           }
         } catch (error) {
           console.error("Gagal update like:", error);
@@ -146,43 +155,20 @@ import Form from "./FormMakeAWish.astro";
     const container = document.getElementById("wishes-container");
     if (!container) return;
 
-    // Initial fetch
-    const { data: wishes, error } = await supabase
-      .from("wishes")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const q = query(collection(db, "wishes"), orderBy("created_at", "desc"));
 
-    if (error) {
+    // Subscribe to realtime changes (juga menangani initial fetch)
+    onSnapshot(q, (snapshot) => {
+      const wishes = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      renderWishes(wishes, container);
+    }, (error) => {
       console.error("Error fetching wishes:", error);
       container.innerHTML = `<p class="col-span-1 md:col-span-2 text-center py-10">Gagal memuat ucapan.</p>`;
-      return;
-    }
-
-    renderWishes(wishes || [], container);
-
-    // Listener untuk update lokal (jika disubmit dari tab ini)
-    window.addEventListener('wish-added', async () => {
-      const { data: updatedWishes } = await supabase
-        .from("wishes")
-        .select("*")
-        .order("created_at", { ascending: false });
-      renderWishes(updatedWishes || [], container);
     });
 
-    // Subscribe to realtime changes (untuk update dari tab/orang lain)
-    supabase
-      .channel("wishes-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "wishes" }, async (payload) => {
-        console.log("Realtime update:", payload);
-        const { data: updatedWishes } = await supabase
-          .from("wishes")
-          .select("*")
-          .order("created_at", { ascending: false });
-        
-        renderWishes(updatedWishes || [], container);
-      })
-      .subscribe((status) => {
-        console.log("Realtime status:", status);
-      });
+    // Listener untuk update lokal tidak diperlukan lagi karena onSnapshot langsung menangkapnya
   });
 </script>

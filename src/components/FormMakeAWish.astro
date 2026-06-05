@@ -48,7 +48,8 @@ import { buy } from "../config";
   </div>
 
 <script>
-  import { supabase } from "../lib/supabase";
+  import { db } from "../lib/firebase";
+  import { collection, addDoc } from "firebase/firestore";
 
   document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('wish-form') as HTMLFormElement;
@@ -76,13 +77,12 @@ import { buy } from "../config";
       const message = formData.get('message') as string;
 
       try {
-        const { error } = await supabase.from("wishes").insert({
+        await addDoc(collection(db, "wishes"), {
           sender_name: name,
           message: message,
+          likes: 0,
           created_at: new Date().toISOString()
         });
-
-        if (error) throw error;
         
         form.reset();
         
