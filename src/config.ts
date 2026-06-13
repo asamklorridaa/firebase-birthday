@@ -2,10 +2,9 @@ const author = {
   name: `Saniya Wardah Musbita`,
   title: `18th Birthday`,
   nickname: `Saniya`,
-  ogImage: `/og-image.jpg`,
+  ogImage: `/og-image.png`,
   description: `Selamat ulang tahun ke-18, Saniya! Rayakan momen spesial ini bersama orang-orang terkasih.`,
   siteUrl: "https://saniya-18th.vercel.app",
-  icon: "/favicon.svg",
 };
 
 const dev = {
