@@ -10,7 +10,7 @@ import svgArrow from "../assets/arrow.svg";
 import svgPinkStar from "../assets/pink-star.svg";
 import svgString from "../assets/string.svg";
 
-import { author, buy } from "../config";
+import { author } from "../config";
 ---
 
 <section class="pb-20 relative">
@@ -21,15 +21,17 @@ import { author, buy } from "../config";
 
         <h1 class="text-5xl font-medium">
           <span>Happy {author.title}</span>
-          <span class="relative">
+          <br />
+          <span class="relative inline-block">
             <span
-              class="absolute bg-[var(--yellow)] w-full h-[50%] left-0 bottom-0 z-1"
+              class="absolute bg-[var(--yellow)] w-full h-[45%] left-0 bottom-0 z-[1]"
             ></span>
-            <span class="relative z-5">{author.name}</span>
+            <span class="relative z-[2]">{author.nickname}</span>
           </span>
+          <span> {author.name.replace(author.nickname, "").trim()}</span>
         </h1>
         <p class="text-xl">
-          Selamat ulang tahun ke-18 untuk <span class="font-bold">{author.nickname}</span> yang luar biasa.
+          {author.description}
         </p>
         <div class="flex mt-5">
           <Button text="Mari kita mulai!" link="/#about" target="_self" />
