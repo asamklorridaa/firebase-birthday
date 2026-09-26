@@ -1,23 +1,21 @@
 ---
 import svgPinkStar from "../assets/pink-star.svg";
 import { author } from "../config";
+import { getAgeComponents } from "../lib/age";
 
-const birthDate = new Date("2008-09-28");
-
-const diff = Date.now() - birthDate.getTime();
-const ageDate = new Date(diff);
-
+const birthDate = "2008-09-28";
+const age = getAgeComponents(birthDate);
 const stats = [
-  { name: `years old`, value: ageDate.getFullYear() - 1970 },
-  { name: `month`, value: ageDate.getMonth() + 1 },
-  { name: `days`, value: ageDate.getDate() },
-  { name: `hour`, value: new Date().getHours() },
-  { name: `minutes`, value: new Date().getMinutes() },
-  { name: `seconds`, value: new Date().getSeconds() },
+  { name: `years old`, value: age["years old"] },
+  { name: `month`, value: age.month },
+  { name: `days`, value: age.days },
+  { name: `hour`, value: age.hour },
+  { name: `minutes`, value: age.minutes },
+  { name: `seconds`, value: age.seconds },
 ];
 ---
 
-<section class="relative px-3 md:px-10 overflow-hidden" id="about">
+<section class="relative px-3 md:px-10 overflow-hidden" id="about" data-birth-date={birthDate}>
   <img
     src={svgPinkStar.src}
     alt="svg"
@@ -83,20 +81,18 @@ const stats = [
 </section>
 
 <script>
+  import { getAgeComponents } from "../lib/age";
+
   function updateTimeStats() {
-    const now = new Date();
+    const section = document.querySelector("#about[data-birth-date]");
+    const birthDateValue = section?.getAttribute("data-birth-date");
+    if (!birthDateValue) return;
 
-    const monthEl = document.querySelector('[data-stat-name="month"]');
-    if (monthEl) monthEl.textContent = (now.getMonth() + 1).toString();
-
-    const hourEl = document.querySelector('[data-stat-name="hour"]');
-    if (hourEl) hourEl.textContent = now.getHours().toString();
-
-    const minEl = document.querySelector('[data-stat-name="minutes"]');
-    if (minEl) minEl.textContent = now.getMinutes().toString();
-
-    const secEl = document.querySelector('[data-stat-name="seconds"]');
-    if (secEl) secEl.textContent = now.getSeconds().toString();
+    const values = getAgeComponents(birthDateValue);
+    for (const [name, value] of Object.entries(values)) {
+      const element = document.querySelector(`[data-stat-name="${name}"]`);
+      if (element) element.textContent = value.toString();
+    }
   }
 
   updateTimeStats();
